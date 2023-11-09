@@ -1,30 +1,31 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
+const cheerio = require('cheerio')
 
-// URL веб-страницы, которую вы хотите скрепить
-const url = 'https://habr.com/ru/articles/460661/';
+const url = 'https://nodejs.org/en/about';
 
-// Выполняем HTTP-запрос к указанной веб-странице
+//get the document
+
 axios.get(url)
-  .then((response) => {
-    if (response.status === 200) {
-      // Используем Cheerio для парсинга HTML-кода
-      const $ = cheerio.load(response.data);
+    .then((responce)=>{
 
-      // Пример: извлекаем заголовок страницы
-      const pageTitle = $('title').text();
-      console.log(`Заголовок страницы: ${pageTitle}`);
+        if(responce.status == 200){
+            const $ = cheerio.load(responce.data)
+            //for example title
+                const pageTitle = $('title').text();
+                console.log(`Page title: ${pageTitle}`)
 
-      // Пример: извлекаем все ссылки на странице
-      $('a').each((index, element) => {
-        const linkText = $(element).text();
-        const linkHref = $(element).attr('href');
-        console.log(`Ссылка ${index + 1}: ${linkText} (${linkHref})`);
-      });
-    } else {
-      console.error('Ошибка при получении данных с веб-страницы');
-    }
-  })
-  .catch((error) => {
-    console.error(`Произошла ошибка: ${error.message}`);
-  });
+                $('a').each((index, element) => {
+                    const linkText = $(element).text;
+                    const linkHref = $(element).attr('href')
+                    console.log(`Link ${index +1 }: ${linkText} (${linkHref})`);
+                })
+                
+
+        }else{
+            console.error("We did not get data from the url")
+        }
+
+    })
+    .catch((error)=>{
+        console.error(`Error from reading uri ${error.message}`)
+    })
