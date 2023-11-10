@@ -1,31 +1,30 @@
 const axios = require('axios');
-const cheerio = require('cheerio')
+const cheerio = require('cheerio');
 
-const url = 'https://nodejs.org/en/about';
+async function scrapeWebPage(url) {
+  try {
+    const response = await axios.get(url);
+    if (response.status === 200) {
+      const $ = cheerio.load(response.data);
 
-//get the document
+      // Извлекаем заголовок страницы
+      const pageTitle = $('title').text();
 
-axios.get(url)
-    .then((responce)=>{
+      // Извлекаем все ссылки на странице
+      const links = [];
+      $('a').each((index, element) => {
+        const linkText = $(element).text();
+        const linkHref = $(element).attr('href');
+        links.push({ text: linkText, href: linkHref });
+      });
 
-        if(responce.status == 200){
-            const $ = cheerio.load(responce.data)
-            //for example title
-                const pageTitle = $('title').text();
-                console.log(`Page title: ${pageTitle}`)
+      return { title: pageTitle, links };
+    } else {
+      return { error: 'HTTP Error' };
+    }
+  } catch (error) {
+    return { error: error.message };
+  }
+}
 
-                $('a').each((index, element) => {
-                    const linkText = $(element).text;
-                    const linkHref = $(element).attr('href')
-                    console.log(`Link ${index +1 }: ${linkText} (${linkHref})`);
-                })
-                
-
-        }else{
-            console.error("We did not get data from the url")
-        }
-
-    })
-    .catch((error)=>{
-        console.error(`Error from reading uri ${error.message}`)
-    })
+module.exports = { scrapeWebPage };
